@@ -1,4 +1,4 @@
-PreviewMode = false -- set to true to preview GUI without running ScriptReward
+PreviewMode = false
 
 if not Key or not ScriptReward or not KeyLink then return end
 
