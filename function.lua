@@ -1,4 +1,5 @@
 if not Key or not ScriptReward or not KeyLink then return end
+if not NameTitle then NameTitle = "Key System" end
 
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
@@ -61,7 +62,7 @@ end
 Close.MouseButton1Click:Connect(cleanup)
 
 local Title = Instance.new("TextLabel")
-Title.Text = "Key System"
+Title.Text = NameTitle
 Title.Font = Enum.Font.Arial
 Title.TextSize = 22
 Title.TextColor3 = Color3.fromRGB(240,240,240)
@@ -210,14 +211,15 @@ task.spawn(function()
     end
 end)
 
--- PARTICLES
-local ParticleFolder = Instance.new("Folder", Main)
+-- PARTICLES OUTSIDE MAIN
+local ParticleFolder = Instance.new("Folder", Gui)
 ParticleFolder.Name = "Particles"
 
 local function spawnCube()
     local cube = Instance.new("Frame")
     cube.Size = UDim2.fromOffset(math.random(4,7), math.random(4,7))
-    cube.Position = UDim2.new(math.random(),0,1.1,0)
+    local xPos = Main.Position.X.Scale + (math.random() * Main.Size.X.Scale)
+    cube.Position = UDim2.new(xPos,0,Main.Position.Y.Scale + Main.Size.Y.Scale + 0.05,0)
     cube.BackgroundColor3 = Color3.fromRGB(0,122,255)
     cube.BackgroundTransparency = 0.2
     cube.BorderSizePixel = 0
@@ -227,7 +229,7 @@ local function spawnCube()
     local rise = TweenService:Create(
         cube,
         TweenInfo.new(math.random(4,7), Enum.EasingStyle.Linear),
-        {Position = UDim2.new(cube.Position.X.Scale,0,-0.2,0), BackgroundTransparency = 1}
+        {Position = UDim2.new(xPos,0,Main.Position.Y.Scale - 0.1,0), BackgroundTransparency = 1}
     )
     rise:Play()
     rise.Completed:Once(function()
@@ -236,7 +238,7 @@ local function spawnCube()
 end
 
 task.spawn(function()
-    while Main.Parent do
+    while Gui.Parent do
         spawnCube()
         task.wait(0.15)
     end
