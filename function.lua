@@ -1,65 +1,78 @@
-if not Key or not ScriptReward or not KeyLink then return end
-if not NameTitle then NameTitle = "Key System" end
+if not Key or not ScriptReward or not KeyLink or not NameTitle or not MainImage then return end
 
 local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
-local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+local KEY_DURATION = 86400
+local SAVE_FILE = "SpectX_KeyData.json"
 
 pcall(function()
-    if CoreGui:FindFirstChild("AppleKeySystem") then
-        CoreGui.AppleKeySystem:Destroy()
+    if CoreGui:FindFirstChild("SpectXKeySystem") then
+        CoreGui.SpectXKeySystem:Destroy()
     end
-    if Lighting:FindFirstChild("AppleKeyBlur") then
-        Lighting.AppleKeyBlur:Destroy()
+    if Lighting:FindFirstChild("SpectXBlur") then
+        Lighting.SpectXBlur:Destroy()
     end
 end)
 
-local Blur = Instance.new("BlurEffect")
-Blur.Name = "AppleKeyBlur"
-Blur.Size = 18
-Blur.Parent = Lighting
+local function save(data)
+    if writefile then
+        writefile(SAVE_FILE, HttpService:JSONEncode(data))
+    end
+end
+
+local function load()
+    if readfile and isfile and isfile(SAVE_FILE) then
+        return HttpService:JSONDecode(readfile(SAVE_FILE))
+    end
+end
+
+local blur = Instance.new("BlurEffect")
+blur.Name = "SpectXBlur"
+blur.Size = 20
+blur.Parent = Lighting
+
+local data = load()
+local verified = false
+local expiry = 0
+
+if data and data.expiry and os.time() < data.expiry then
+    verified = true
+    expiry = data.expiry
+end
 
 local Gui = Instance.new("ScreenGui")
-Gui.Name = "AppleKeySystem"
+Gui.Name = "SpectXKeySystem"
+Gui.IgnoreGuiInset = true
 Gui.ResetOnSpawn = false
 Gui.Parent = CoreGui
 
 local Main = Instance.new("ImageLabel")
 Main.Name = "Main"
-Main.Size = UDim2.fromScale(0.34,0.47)
-Main.Position = UDim2.fromScale(0.33,0.25)
-Main.Image = "rbxassetid://4828384114"
+Main.Size = UDim2.fromScale(0.36,0.52)
+Main.Position = UDim2.fromScale(0.32,0.24)
+Main.Image = MainImage
 Main.ScaleType = Enum.ScaleType.Stretch
 Main.BackgroundTransparency = 1
-Main.BorderSizePixel = 0
+Main.ZIndex = 10
 Main.Parent = Gui
-Instance.new("UICorner",Main).CornerRadius = UDim.new(0,18)
 
-local Gradient = Instance.new("UIGradient")
-Gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(42,42,42)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,18))
-}
-Gradient.Rotation = 90
-Gradient.Parent = Main
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0,20)
+MainCorner.Parent = Main
 
 local Close = Instance.new("TextButton")
 Close.Text = "×"
 Close.Font = Enum.Font.Arial
-Close.TextSize = 24
+Close.TextSize = 26
 Close.TextColor3 = Color3.fromRGB(200,200,200)
 Close.BackgroundTransparency = 1
 Close.Size = UDim2.new(0,40,0,40)
 Close.Position = UDim2.new(1,-45,0,5)
+Close.ZIndex = 11
 Close.Parent = Main
-
-local function cleanup()
-    Gui:Destroy()
-    Blur:Destroy()
-end
-
-Close.MouseButton1Click:Connect(cleanup)
 
 local Title = Instance.new("TextLabel")
 Title.Text = NameTitle
@@ -68,94 +81,126 @@ Title.TextSize = 22
 Title.TextColor3 = Color3.fromRGB(240,240,240)
 Title.BackgroundTransparency = 1
 Title.Size = UDim2.new(1,-60,0,50)
-Title.Position = UDim2.new(0,20,0,0)
+Title.Position = UDim2.new(0,30,0,10)
 Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 11
 Title.Parent = Main
 
 local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.fromScale(1,0.72)
-Scroll.Position = UDim2.fromScale(0,0.18)
-Scroll.CanvasSize = UDim2.new(0,0,0,320)
-Scroll.ScrollBarThickness = 4
+Scroll.Size = UDim2.new(1,-40,1,-90)
+Scroll.Position = UDim2.new(0,20,0,70)
+Scroll.CanvasSize = UDim2.new(0,0,0,420)
+Scroll.ScrollBarImageTransparency = 0.4
 Scroll.BackgroundTransparency = 1
 Scroll.BorderSizePixel = 0
+Scroll.ZIndex = 11
 Scroll.Parent = Main
 
-local Input = Instance.new("TextBox")
-Input.PlaceholderText = "Enter key"
-Input.ClearTextOnFocus = false
-Input.Font = Enum.Font.Arial
-Input.TextSize = 14
-Input.TextColor3 = Color3.fromRGB(240,240,240)
-Input.BackgroundColor3 = Color3.fromRGB(35,35,35)
-Input.Size = UDim2.new(0.85,0,0,42)
-Input.Position = UDim2.fromScale(0.075,0.05)
-Input.Parent = Scroll
-Instance.new("UICorner",Input).CornerRadius = UDim.new(0,10)
-
-local Copy = Instance.new("TextButton")
-Copy.Text = "Copy Key Link"
-Copy.Font = Enum.Font.Arial
-Copy.TextSize = 13
-Copy.TextColor3 = Color3.fromRGB(0,122,255)
-Copy.BackgroundTransparency = 1
-Copy.Size = UDim2.new(0.85,0,0,28)
-Copy.Position = UDim2.fromScale(0.075,0.25)
-Copy.Parent = Scroll
-
-local Verify = Instance.new("TextButton")
-Verify.Text = "Verify Key"
-Verify.Font = Enum.Font.Arial
-Verify.TextSize = 15
-Verify.TextColor3 = Color3.fromRGB(255,255,255)
-Verify.BackgroundColor3 = Color3.fromRGB(0,122,255)
-Verify.Size = UDim2.new(0.85,0,0,44)
-Verify.Position = UDim2.fromScale(0.075,0.42)
-Verify.Parent = Scroll
-Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,12)
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0,14)
+Layout.Parent = Scroll
 
 local Status = Instance.new("TextLabel")
-Status.Text = ""
 Status.Font = Enum.Font.Arial
-Status.TextSize = 13
-Status.TextColor3 = Color3.fromRGB(200,200,200)
+Status.TextSize = 14
+Status.TextColor3 = Color3.fromRGB(120,180,255)
 Status.BackgroundTransparency = 1
-Status.Size = UDim2.new(1,0,0,24)
-Status.Position = UDim2.fromScale(0,0.6)
-Status.TextXAlignment = Enum.TextXAlignment.Center
+Status.Size = UDim2.new(1,0,0,30)
+Status.Text = ""
+Status.ZIndex = 11
 Status.Parent = Scroll
 
-local Credits = Instance.new("TextLabel")
-Credits.Text = "Scripted by SpectravaxISBACK"
-Credits.Font = Enum.Font.Arial
-Credits.TextSize = 13
-Credits.TextColor3 = Color3.fromRGB(160,160,160)
-Credits.BackgroundTransparency = 1
-Credits.Size = UDim2.new(1,0,0,30)
-Credits.Position = UDim2.new(0,0,1,-30)
-Credits.TextXAlignment = Enum.TextXAlignment.Center
-Credits.Parent = Scroll
+if not verified then
+    local Input = Instance.new("TextBox")
+    Input.PlaceholderText = "Enter key"
+    Input.Font = Enum.Font.Arial
+    Input.TextSize = 15
+    Input.TextColor3 = Color3.fromRGB(230,230,230)
+    Input.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    Input.Size = UDim2.new(1,0,0,42)
+    Input.ClearTextOnFocus = false
+    Input.ZIndex = 11
+    Input.Parent = Scroll
+    Instance.new("UICorner",Input).CornerRadius = UDim.new(0,10)
 
-Copy.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(KeyLink)
-        Status.Text = "Link copied"
-    end
-end)
+    local Copy = Instance.new("TextButton")
+    Copy.Text = "Copy Key Link"
+    Copy.Font = Enum.Font.Arial
+    Copy.TextSize = 14
+    Copy.TextColor3 = Color3.fromRGB(120,180,255)
+    Copy.BackgroundTransparency = 1
+    Copy.Size = UDim2.new(1,0,0,30)
+    Copy.ZIndex = 11
+    Copy.Parent = Scroll
 
-Verify.MouseButton1Click:Connect(function()
-    if Input.Text == Key then
-        Status.Text = "Key verified"
-        task.wait(0.25)
-        cleanup()
-        if type(ScriptReward) == "function" then
-            pcall(ScriptReward)
-        elseif type(ScriptReward) == "string" then
-            pcall(loadstring(ScriptReward))
+    Copy.MouseButton1Click:Connect(function()
+        if setclipboard then
+            setclipboard(KeyLink)
+            Status.Text = "Key link copied"
         end
-    else
-        Status.Text = "Invalid key"
+    end)
+
+    local Verify = Instance.new("TextButton")
+    Verify.Text = "Verify Key"
+    Verify.Font = Enum.Font.Arial
+    Verify.TextSize = 15
+    Verify.TextColor3 = Color3.fromRGB(255,255,255)
+    Verify.BackgroundColor3 = Color3.fromRGB(0,120,255)
+    Verify.Size = UDim2.new(1,0,0,44)
+    Verify.ZIndex = 11
+    Verify.Parent = Scroll
+    Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,10)
+
+    Verify.MouseButton1Click:Connect(function()
+        if Input.Text == Key then
+            local exp = os.time() + KEY_DURATION
+            save({expiry = exp})
+            Status.Text = "Key verified"
+            task.wait(0.3)
+            Gui:Destroy()
+            blur:Destroy()
+            pcall(ScriptReward)
+        else
+            Status.Text = "Invalid key"
+        end
+    end)
+else
+    local function formatTime(sec)
+        local h = math.floor(sec/3600)
+        local m = math.floor((sec%3600)/60)
+        local s = sec%60
+        return string.format("%02d:%02d:%02d",h,m,s)
     end
+
+    task.spawn(function()
+        while Gui.Parent do
+            local remaining = expiry - os.time()
+            if remaining <= 0 then
+                Gui:Destroy()
+                blur:Destroy()
+                break
+            end
+            Status.Text = "Expires in "..formatTime(remaining)
+            task.wait(1)
+        end
+    end)
+
+    pcall(ScriptReward)
+end
+
+local Credit = Instance.new("TextLabel")
+Credit.Text = "Scripted by SpectravaxISBACK"
+Credit.Font = Enum.Font.Arial
+Credit.TextSize = 12
+Credit.TextColor3 = Color3.fromRGB(150,150,150)
+Credit.BackgroundTransparency = 1
+Credit.Size = UDim2.new(1,0,0,30)
+Credit.ZIndex = 11
+Credit.Parent = Scroll
+
+Close.MouseButton1Click:Connect(function()
+    Gui:Destroy()
+    blur:Destroy()
 end)
 
 local dragging,startPos,startFrame
@@ -170,12 +215,7 @@ end)
 UserInputService.InputChanged:Connect(function(i)
     if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
         local d = i.Position - startPos
-        Main.Position = UDim2.new(
-            startFrame.X.Scale,
-            startFrame.X.Offset + d.X,
-            startFrame.Y.Scale,
-            startFrame.Y.Offset + d.Y
-        )
+        Main.Position = UDim2.new(startFrame.X.Scale,startFrame.X.Offset+d.X,startFrame.Y.Scale,startFrame.Y.Offset+d.Y)
     end
 end)
 
@@ -185,61 +225,29 @@ UserInputService.InputEnded:Connect(function(i)
     end
 end)
 
--- ANIMATIONS
-Main.Size = UDim2.fromScale(0.34,0.47)
-Main.ImageTransparency = 1
-TweenService:Create(
-    Main,
-    TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-    {Size = UDim2.fromScale(0.36,0.5), ImageTransparency = 0}
-):Play()
+for i = 1,24 do
+    local p = Instance.new("Frame")
+    p.Size = UDim2.new(0,6,0,6)
+    p.BackgroundColor3 = Color3.fromRGB(0,120,255)
+    p.BorderSizePixel = 0
+    p.AnchorPoint = Vector2.new(0.5,0.5)
+    p.Position = UDim2.fromScale(math.random(),1.1)
+    p.ZIndex = 2
+    p.Parent = Gui
 
-task.spawn(function()
-    while Main.Parent do
-        TweenService:Create(
-            Main,
-            TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-            {Position = Main.Position + UDim2.fromOffset(0, -6)}
-        ):Play()
-        task.wait(2.5)
-        TweenService:Create(
-            Main,
-            TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-            {Position = Main.Position + UDim2.fromOffset(0, 6)}
-        ):Play()
-        task.wait(2.5)
-    end
-end)
+    local pc = Instance.new("UICorner")
+    pc.CornerRadius = UDim.new(1,0)
+    pc.Parent = p
 
--- PARTICLES OUTSIDE MAIN
-local ParticleFolder = Instance.new("Folder", Gui)
-ParticleFolder.Name = "Particles"
-
-local function spawnCube()
-    local cube = Instance.new("Frame")
-    cube.Size = UDim2.fromOffset(math.random(4,7), math.random(4,7))
-    local xPos = Main.Position.X.Scale + (math.random() * Main.Size.X.Scale)
-    cube.Position = UDim2.new(xPos,0,Main.Position.Y.Scale + Main.Size.Y.Scale + 0.05,0)
-    cube.BackgroundColor3 = Color3.fromRGB(0,122,255)
-    cube.BackgroundTransparency = 0.2
-    cube.BorderSizePixel = 0
-    cube.Parent = ParticleFolder
-    Instance.new("UICorner", cube).CornerRadius = UDim.new(0,2)
-
-    local rise = TweenService:Create(
-        cube,
-        TweenInfo.new(math.random(4,7), Enum.EasingStyle.Linear),
-        {Position = UDim2.new(xPos,0,Main.Position.Y.Scale - 0.1,0), BackgroundTransparency = 1}
-    )
-    rise:Play()
-    rise.Completed:Once(function()
-        cube:Destroy()
+    task.spawn(function()
+        while p.Parent do
+            local x = math.random()
+            local y = 1.1
+            while y > -0.1 do
+                y -= 0.002
+                p.Position = UDim2.fromScale(x,y)
+                task.wait()
+            end
+        end
     end)
 end
-
-task.spawn(function()
-    while Gui.Parent do
-        spawnCube()
-        task.wait(0.15)
-    end
-end)
