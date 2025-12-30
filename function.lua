@@ -225,13 +225,14 @@ UserInputService.InputEnded:Connect(function(i)
     end
 end)
 
+-- Blue particles outside the Main ImageLabel
 for i = 1,24 do
     local p = Instance.new("Frame")
     p.Size = UDim2.new(0,6,0,6)
     p.BackgroundColor3 = Color3.fromRGB(0,120,255)
     p.BorderSizePixel = 0
     p.AnchorPoint = Vector2.new(0.5,0.5)
-    p.Position = UDim2.fromScale(math.random(),1.1)
+    p.Position = UDim2.fromScale(math.random(), math.random())
     p.ZIndex = 2
     p.Parent = Gui
 
@@ -239,13 +240,17 @@ for i = 1,24 do
     pc.CornerRadius = UDim.new(1,0)
     pc.Parent = p
 
+    local speed = math.random(5,15)/1000
+
     task.spawn(function()
         while p.Parent do
             local x = math.random()
             local y = 1.1
+            local offset = math.random()
+            y = y + offset
             while y > -0.1 do
-                y -= 0.002
-                p.Position = UDim2.fromScale(x,y)
+                y -= speed
+                p.Position = UDim2.fromScale(x, y)
                 task.wait()
             end
         end
