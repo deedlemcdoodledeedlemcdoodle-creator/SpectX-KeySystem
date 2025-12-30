@@ -1,4 +1,4 @@
-PreviewMode = true -- set this to true to see the GUI without redeeming
+PreviewMode = false -- set to true to preview GUI without running ScriptReward
 
 if not Key or not ScriptReward or not KeyLink then return end
 
@@ -44,9 +44,10 @@ Gui.ResetOnSpawn = false
 Gui.Parent = CoreGui
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.fromScale(0.35,0.4)
-Main.Position = UDim2.fromScale(0.325,0.3)
+Main.Size = UDim2.fromScale(0.35,0.48)
+Main.Position = UDim2.fromScale(0.325,0.26)
 Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Main.BackgroundTransparency = 0
 Main.BorderSizePixel = 0
 Main.Parent = Gui
 Instance.new("UICorner",Main).CornerRadius = UDim.new(0,16)
@@ -123,7 +124,7 @@ else
     Input.TextColor3 = Color3.fromRGB(240,240,240)
     Input.BackgroundColor3 = Color3.fromRGB(35,35,35)
     Input.Size = UDim2.new(0.85,0,0,40)
-    Input.Position = UDim2.fromScale(0.075,0.38)
+    Input.Position = UDim2.fromScale(0.075,0.32)
     Input.Parent = Main
     Instance.new("UICorner",Input).CornerRadius = UDim.new(0,10)
 
@@ -133,9 +134,10 @@ else
     Copy.TextSize = 13
     Copy.TextColor3 = Color3.fromRGB(0,122,255)
     Copy.BackgroundTransparency = 1
-    Copy.Size = UDim2.new(1,0,0,25)
-    Copy.Position = UDim2.fromScale(0,0.52)
+    Copy.Size = UDim2.new(0.85,0,0,30)
+    Copy.Position = UDim2.fromScale(0.075,0.45)
     Copy.Parent = Main
+    Instance.new("UICorner",Copy).CornerRadius = UDim.new(0,10)
     Copy.MouseButton1Click:Connect(function()
         if setclipboard then
             setclipboard(KeyLink)
@@ -151,7 +153,7 @@ else
     Verify.TextColor3 = Color3.fromRGB(255,255,255)
     Verify.BackgroundColor3 = Color3.fromRGB(0,122,255)
     Verify.Size = UDim2.new(0.85,0,0,40)
-    Verify.Position = UDim2.fromScale(0.075,0.7)
+    Verify.Position = UDim2.fromScale(0.075,0.58)
     Verify.Parent = Main
     Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,10)
     Verify.MouseButton1Click:Connect(function()
@@ -167,4 +169,39 @@ else
             pcall(loadstring(ScriptReward))
         end
     end)
+
+    local Scroll = Instance.new("ScrollingFrame")
+    Scroll.Size = UDim2.new(0.9,0,0.15,0)
+    Scroll.Position = UDim2.fromScale(0.05,0.75)
+    Scroll.BackgroundTransparency = 1
+    Scroll.ScrollBarThickness = 5
+    Scroll.Parent = Main
+
+    local Credits = Instance.new("TextLabel")
+    Credits.Text = "Scripted by SpectravaxISBACK"
+    Credits.Font = Enum.Font.Gotham
+    Credits.TextSize = 14
+    Credits.TextColor3 = Color3.fromRGB(200,200,200)
+    Credits.BackgroundTransparency = 1
+    Credits.Size = UDim2.new(1,0,0,50)
+    Credits.TextYAlignment = Enum.TextYAlignment.Top
+    Credits.Parent = Scroll
 end
+
+local dragging,startPos,startFrame
+Main.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging=true
+        startPos=i.Position
+        startFrame=Main.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(i)
+    if dragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-startPos
+        Main.Position=UDim2.new(startFrame.X.Scale,startFrame.X.Offset+d.X,startFrame.Y.Scale,startFrame.Y.Offset+d.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
+end)
