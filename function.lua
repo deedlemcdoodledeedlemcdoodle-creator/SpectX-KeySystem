@@ -1,5 +1,3 @@
-PreviewMode = false
-
 if not Key or not ScriptReward or not KeyLink then return end
 
 local CoreGui = game:GetService("CoreGui")
@@ -60,7 +58,7 @@ Gradient.Color = ColorSequence.new{
 
 local Close = Instance.new("TextButton")
 Close.Text = "×"
-Close.Font = Enum.Font.GothamMedium
+Close.Font = Enum.Font.Arial
 Close.TextSize = 24
 Close.TextColor3 = Color3.fromRGB(200,200,200)
 Close.BackgroundTransparency = 1
@@ -76,7 +74,7 @@ Close.MouseButton1Click:Connect(cleanup)
 
 local Title = Instance.new("TextLabel")
 Title.Text = "Key System"
-Title.Font = Enum.Font.Gotham
+Title.Font = Enum.Font.Arial
 Title.TextSize = 22
 Title.TextColor3 = Color3.fromRGB(240,240,240)
 Title.BackgroundTransparency = 1
@@ -86,7 +84,7 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Main
 
 local Status = Instance.new("TextLabel")
-Status.Font = Enum.Font.Gotham
+Status.Font = Enum.Font.Arial
 Status.TextSize = 14
 Status.TextColor3 = Color3.fromRGB(0,150,0)
 Status.BackgroundTransparency = 1
@@ -94,14 +92,16 @@ Status.Size = UDim2.new(1,0,0,40)
 Status.Position = UDim2.fromScale(0,0.45)
 Status.Parent = Main
 
-if verified and not PreviewMode then
+if verified then
     local function formatTime(sec)
         local h = math.floor(sec/3600)
         local m = math.floor((sec%3600)/60)
         local s = sec%60
         return string.format("%02d:%02d:%02d",h,m,s)
     end
+
     Status.Text = "Verified ✓"
+
     task.spawn(function()
         while Gui.Parent do
             local remaining = expiry - os.time()
@@ -110,6 +110,30 @@ if verified and not PreviewMode then
             task.wait(1)
         end
     end)
+
+    local Skip = Instance.new("TextButton")
+    Skip.Text = "Skip Time"
+    Skip.Font = Enum.Font.Arial
+    Skip.TextSize = 14
+    Skip.TextColor3 = Color3.fromRGB(255,255,255)
+    Skip.BackgroundColor3 = Color3.fromRGB(0,122,255)
+    Skip.Size = UDim2.new(0.85,0,0,40)
+    Skip.Position = UDim2.fromScale(0.075,0.7)
+    Skip.Parent = Main
+    Instance.new("UICorner",Skip).CornerRadius = UDim.new(0,10)
+
+    Skip.MouseButton1Click:Connect(function()
+        expiry = os.time()
+        Status.Text = "Expires in 00:00:00"
+        task.wait(0.3)
+        cleanup()
+        if type(ScriptReward)=="function" then
+            pcall(ScriptReward)
+        elseif type(ScriptReward)=="string" then
+            pcall(loadstring(ScriptReward))
+        end
+    end)
+
     if type(ScriptReward)=="function" then
         pcall(ScriptReward)
     elseif type(ScriptReward)=="string" then
@@ -119,7 +143,7 @@ else
     local Input = Instance.new("TextBox")
     Input.PlaceholderText = "Enter key"
     Input.ClearTextOnFocus = false
-    Input.Font = Enum.Font.Gotham
+    Input.Font = Enum.Font.Arial
     Input.TextSize = 14
     Input.TextColor3 = Color3.fromRGB(240,240,240)
     Input.BackgroundColor3 = Color3.fromRGB(35,35,35)
@@ -130,7 +154,7 @@ else
 
     local Copy = Instance.new("TextButton")
     Copy.Text = "Copy Key Link"
-    Copy.Font = Enum.Font.Gotham
+    Copy.Font = Enum.Font.Arial
     Copy.TextSize = 13
     Copy.TextColor3 = Color3.fromRGB(0,122,255)
     Copy.BackgroundTransparency = 1
@@ -148,7 +172,7 @@ else
 
     local Verify = Instance.new("TextButton")
     Verify.Text = "Verify Key"
-    Verify.Font = Enum.Font.GothamMedium
+    Verify.Font = Enum.Font.Arial
     Verify.TextSize = 14
     Verify.TextColor3 = Color3.fromRGB(255,255,255)
     Verify.BackgroundColor3 = Color3.fromRGB(0,122,255)
@@ -179,7 +203,7 @@ else
 
     local Credits = Instance.new("TextLabel")
     Credits.Text = "Scripted by SpectravaxISBACK"
-    Credits.Font = Enum.Font.Gotham
+    Credits.Font = Enum.Font.Arial
     Credits.TextSize = 14
     Credits.TextColor3 = Color3.fromRGB(200,200,200)
     Credits.BackgroundTransparency = 1
