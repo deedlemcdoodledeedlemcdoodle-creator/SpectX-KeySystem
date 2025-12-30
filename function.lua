@@ -25,7 +25,7 @@ end)
 
 local Blur = Instance.new("BlurEffect")
 Blur.Name = "AppleKeyBlur"
-Blur.Size = 18
+Blur.Size = 20
 Blur.Parent = Lighting
 
 local data = load()
@@ -42,21 +42,24 @@ Gui.ResetOnSpawn = false
 Gui.Parent = CoreGui
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.fromScale(0.3,0.34)
-Main.Position = UDim2.fromScale(0.35,0.33)
-Main.BackgroundColor3 = Color3.fromRGB(245,245,245)
+Main.Size = UDim2.fromScale(0.35,0.4) -- slightly bigger
+Main.Position = UDim2.fromScale(0.325,0.3)
+Main.BackgroundColor3 = Color3.fromRGB(25,25,25) -- dark mode
 Main.BorderSizePixel = 0
 Main.Parent = Gui
 Instance.new("UICorner",Main).CornerRadius = UDim.new(0,16)
 
 local Gradient = Instance.new("UIGradient",Main)
-Gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(1,Color3.fromRGB(230,230,230))}
+Gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(35,35,35)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,20))
+}
 
 local Close = Instance.new("TextButton")
 Close.Text = "×"
 Close.Font = Enum.Font.GothamMedium
-Close.TextSize = 22
-Close.TextColor3 = Color3.fromRGB(120,120,120)
+Close.TextSize = 24
+Close.TextColor3 = Color3.fromRGB(200,200,200)
 Close.BackgroundTransparency = 1
 Close.Size = UDim2.new(0,40,0,40)
 Close.Position = UDim2.new(1,-45,0,5)
@@ -71,8 +74,8 @@ Close.MouseButton1Click:Connect(cleanup)
 local Title = Instance.new("TextLabel")
 Title.Text = "Key System"
 Title.Font = Enum.Font.Gotham
-Title.TextSize = 20
-Title.TextColor3 = Color3.fromRGB(25,25,25)
+Title.TextSize = 22
+Title.TextColor3 = Color3.fromRGB(240,240,240)
 Title.BackgroundTransparency = 1
 Title.Size = UDim2.new(1,-40,0,50)
 Title.Position = UDim2.new(0,20,0,0)
@@ -115,10 +118,10 @@ else
     Input.ClearTextOnFocus = false
     Input.Font = Enum.Font.Gotham
     Input.TextSize = 14
-    Input.TextColor3 = Color3.fromRGB(30,30,30)
-    Input.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Input.TextColor3 = Color3.fromRGB(240,240,240)
+    Input.BackgroundColor3 = Color3.fromRGB(35,35,35)
     Input.Size = UDim2.new(0.85,0,0,40)
-    Input.Position = UDim2.fromScale(0.075,0.32)
+    Input.Position = UDim2.fromScale(0.075,0.38) -- moved down a little
     Input.Parent = Main
     Instance.new("UICorner",Input).CornerRadius = UDim.new(0,10)
 
@@ -146,7 +149,7 @@ else
     Verify.TextColor3 = Color3.fromRGB(255,255,255)
     Verify.BackgroundColor3 = Color3.fromRGB(0,122,255)
     Verify.Size = UDim2.new(0.85,0,0,40)
-    Verify.Position = UDim2.fromScale(0.075,0.65)
+    Verify.Position = UDim2.fromScale(0.075,0.7) -- moved down more
     Verify.Parent = Main
     Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,10)
     Verify.MouseButton1Click:Connect(function()
