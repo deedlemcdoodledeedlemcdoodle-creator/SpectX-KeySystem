@@ -5,13 +5,17 @@ local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 
 pcall(function()
-    if CoreGui:FindFirstChild("AppleKeySystem") then CoreGui.AppleKeySystem:Destroy() end
-    if Lighting:FindFirstChild("AppleKeyBlur") then Lighting.AppleKeyBlur:Destroy() end
+    if CoreGui:FindFirstChild("AppleKeySystem") then
+        CoreGui.AppleKeySystem:Destroy()
+    end
+    if Lighting:FindFirstChild("AppleKeyBlur") then
+        Lighting.AppleKeyBlur:Destroy()
+    end
 end)
 
 local Blur = Instance.new("BlurEffect")
 Blur.Name = "AppleKeyBlur"
-Blur.Size = 20
+Blur.Size = 18
 Blur.Parent = Lighting
 
 local Gui = Instance.new("ScreenGui")
@@ -20,19 +24,20 @@ Gui.ResetOnSpawn = false
 Gui.Parent = CoreGui
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.fromScale(0.35,0.48)
-Main.Position = UDim2.fromScale(0.325,0.26)
+Main.Size = UDim2.fromScale(0.36,0.5)
+Main.Position = UDim2.fromScale(0.32,0.25)
 Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
-Main.BackgroundTransparency = 0
 Main.BorderSizePixel = 0
 Main.Parent = Gui
-Instance.new("UICorner",Main).CornerRadius = UDim.new(0,16)
+Instance.new("UICorner",Main).CornerRadius = UDim.new(0,18)
 
-local Gradient = Instance.new("UIGradient",Main)
+local Gradient = Instance.new("UIGradient")
 Gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(35,35,35)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,20))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(42,42,42)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,18))
 }
+Gradient.Rotation = 90
+Gradient.Parent = Main
 
 local Close = Instance.new("TextButton")
 Close.Text = "×"
@@ -48,6 +53,7 @@ local function cleanup()
     Gui:Destroy()
     Blur:Destroy()
 end
+
 Close.MouseButton1Click:Connect(cleanup)
 
 local Title = Instance.new("TextLabel")
@@ -56,19 +62,19 @@ Title.Font = Enum.Font.Arial
 Title.TextSize = 22
 Title.TextColor3 = Color3.fromRGB(240,240,240)
 Title.BackgroundTransparency = 1
-Title.Size = UDim2.new(1,-40,0,50)
+Title.Size = UDim2.new(1,-60,0,50)
 Title.Position = UDim2.new(0,20,0,0)
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Main
 
-local Status = Instance.new("TextLabel")
-Status.Font = Enum.Font.Arial
-Status.TextSize = 14
-Status.TextColor3 = Color3.fromRGB(0,150,0)
-Status.BackgroundTransparency = 1
-Status.Size = UDim2.new(1,0,0,40)
-Status.Position = UDim2.fromScale(0,0.45)
-Status.Parent = Main
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.fromScale(1,0.72)
+Scroll.Position = UDim2.fromScale(0,0.18)
+Scroll.CanvasSize = UDim2.new(0,0,0,320)
+Scroll.ScrollBarThickness = 4
+Scroll.BackgroundTransparency = 1
+Scroll.BorderSizePixel = 0
+Scroll.Parent = Main
 
 local Input = Instance.new("TextBox")
 Input.PlaceholderText = "Enter key"
@@ -77,9 +83,9 @@ Input.Font = Enum.Font.Arial
 Input.TextSize = 14
 Input.TextColor3 = Color3.fromRGB(240,240,240)
 Input.BackgroundColor3 = Color3.fromRGB(35,35,35)
-Input.Size = UDim2.new(0.85,0,0,40)
-Input.Position = UDim2.fromScale(0.075,0.32)
-Input.Parent = Main
+Input.Size = UDim2.new(0.85,0,0,42)
+Input.Position = UDim2.fromScale(0.075,0.05)
+Input.Parent = Scroll
 Instance.new("UICorner",Input).CornerRadius = UDim.new(0,10)
 
 local Copy = Instance.new("TextButton")
@@ -88,72 +94,86 @@ Copy.Font = Enum.Font.Arial
 Copy.TextSize = 13
 Copy.TextColor3 = Color3.fromRGB(0,122,255)
 Copy.BackgroundTransparency = 1
-Copy.Size = UDim2.new(0.85,0,0,30)
-Copy.Position = UDim2.fromScale(0.075,0.45)
-Copy.Parent = Main
-Instance.new("UICorner",Copy).CornerRadius = UDim.new(0,10)
-Copy.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(KeyLink)
-        Status.TextColor3 = Color3.fromRGB(0,150,0)
-        Status.Text = "Link copied!"
-    end
-end)
+Copy.Size = UDim2.new(0.85,0,0,28)
+Copy.Position = UDim2.fromScale(0.075,0.25)
+Copy.Parent = Scroll
 
 local Verify = Instance.new("TextButton")
 Verify.Text = "Verify Key"
 Verify.Font = Enum.Font.Arial
-Verify.TextSize = 14
+Verify.TextSize = 15
 Verify.TextColor3 = Color3.fromRGB(255,255,255)
 Verify.BackgroundColor3 = Color3.fromRGB(0,122,255)
-Verify.Size = UDim2.new(0.85,0,0,40)
-Verify.Position = UDim2.fromScale(0.075,0.58)
-Verify.Parent = Main
-Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,10)
-Verify.MouseButton1Click:Connect(function()
-    local exp = os.time() + 86400
-    Status.TextColor3 = Color3.fromRGB(0,150,0)
-    Status.Text = "Key verified!"
-    task.wait(0.3)
-    cleanup()
-    if type(ScriptReward)=="function" then
-        pcall(ScriptReward)
-    elseif type(ScriptReward)=="string" then
-        pcall(loadstring(ScriptReward))
-    end
-end)
+Verify.Size = UDim2.new(0.85,0,0,44)
+Verify.Position = UDim2.fromScale(0.075,0.42)
+Verify.Parent = Scroll
+Instance.new("UICorner",Verify).CornerRadius = UDim.new(0,12)
 
-local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.new(0.9,0,0.15,0)
-Scroll.Position = UDim2.fromScale(0.05,0.75)
-Scroll.BackgroundTransparency = 1
-Scroll.ScrollBarThickness = 5
-Scroll.Parent = Main
+local Status = Instance.new("TextLabel")
+Status.Text = ""
+Status.Font = Enum.Font.Arial
+Status.TextSize = 13
+Status.TextColor3 = Color3.fromRGB(200,200,200)
+Status.BackgroundTransparency = 1
+Status.Size = UDim2.new(1,0,0,24)
+Status.Position = UDim2.fromScale(0,0.6)
+Status.TextXAlignment = Enum.TextXAlignment.Center
+Status.Parent = Scroll
 
 local Credits = Instance.new("TextLabel")
 Credits.Text = "Scripted by SpectravaxISBACK"
 Credits.Font = Enum.Font.Arial
-Credits.TextSize = 14
-Credits.TextColor3 = Color3.fromRGB(200,200,200)
+Credits.TextSize = 13
+Credits.TextColor3 = Color3.fromRGB(160,160,160)
 Credits.BackgroundTransparency = 1
-Credits.Size = UDim2.new(1,0,0,50)
-Credits.TextYAlignment = Enum.TextYAlignment.Top
+Credits.Size = UDim2.new(1,0,0,30)
+Credits.Position = UDim2.new(0,0,1,-30)
+Credits.TextXAlignment = Enum.TextXAlignment.Center
 Credits.Parent = Scroll
+
+Copy.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(KeyLink)
+        Status.Text = "Link copied"
+    end
+end)
+
+Verify.MouseButton1Click:Connect(function()
+    if Input.Text == Key then
+        Status.Text = "Key verified"
+        task.wait(0.25)
+        cleanup()
+        if type(ScriptReward) == "function" then
+            pcall(ScriptReward)
+        elseif type(ScriptReward) == "string" then
+            pcall(loadstring(ScriptReward))
+        end
+    else
+        Status.Text = "Invalid key"
+    end
+end)
 
 local dragging,startPos,startFrame
 Main.InputBegan:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging=true
-        startPos=i.Position
-        startFrame=Main.Position
+        dragging = true
+        startPos = i.Position
+        startFrame = Main.Position
     end
 end)
 UserInputService.InputChanged:Connect(function(i)
-    if dragging and i.UserInputType==Enum.UserInputType.MouseMovement then
-        local d=i.Position-startPos
-        Main.Position=UDim2.new(startFrame.X.Scale,startFrame.X.Offset+d.X,startFrame.Y.Scale,startFrame.Y.Offset+d.Y)
+    if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
+        local d = i.Position - startPos
+        Main.Position = UDim2.new(
+            startFrame.X.Scale,
+            startFrame.X.Offset + d.X,
+            startFrame.Y.Scale,
+            startFrame.Y.Offset + d.Y
+        )
     end
 end)
 UserInputService.InputEnded:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
+    if i.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
 end)
