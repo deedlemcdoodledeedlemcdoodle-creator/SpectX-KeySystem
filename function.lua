@@ -3,6 +3,7 @@ if not Key or not ScriptReward or not KeyLink then return end
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
 pcall(function()
     if CoreGui:FindFirstChild("AppleKeySystem") then
@@ -23,10 +24,13 @@ Gui.Name = "AppleKeySystem"
 Gui.ResetOnSpawn = false
 Gui.Parent = CoreGui
 
-local Main = Instance.new("Frame")
-Main.Size = UDim2.fromScale(0.36,0.5)
-Main.Position = UDim2.fromScale(0.32,0.25)
-Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+local Main = Instance.new("ImageLabel")
+Main.Name = "Main"
+Main.Size = UDim2.fromScale(0.34,0.47)
+Main.Position = UDim2.fromScale(0.33,0.25)
+Main.Image = "rbxassetid://112819182253577"
+Main.ScaleType = Enum.ScaleType.Stretch
+Main.BackgroundTransparency = 1
 Main.BorderSizePixel = 0
 Main.Parent = Gui
 Instance.new("UICorner",Main).CornerRadius = UDim.new(0,18)
@@ -161,6 +165,7 @@ Main.InputBegan:Connect(function(i)
         startFrame = Main.Position
     end
 end)
+
 UserInputService.InputChanged:Connect(function(i)
     if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
         local d = i.Position - startPos
@@ -172,8 +177,67 @@ UserInputService.InputChanged:Connect(function(i)
         )
     end
 end)
+
 UserInputService.InputEnded:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
+    end
+end)
+
+-- ANIMATIONS
+Main.Size = UDim2.fromScale(0.34,0.47)
+Main.ImageTransparency = 1
+TweenService:Create(
+    Main,
+    TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+    {Size = UDim2.fromScale(0.36,0.5), ImageTransparency = 0}
+):Play()
+
+task.spawn(function()
+    while Main.Parent do
+        TweenService:Create(
+            Main,
+            TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+            {Position = Main.Position + UDim2.fromOffset(0, -6)}
+        ):Play()
+        task.wait(2.5)
+        TweenService:Create(
+            Main,
+            TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+            {Position = Main.Position + UDim2.fromOffset(0, 6)}
+        ):Play()
+        task.wait(2.5)
+    end
+end)
+
+-- PARTICLES
+local ParticleFolder = Instance.new("Folder", Main)
+ParticleFolder.Name = "Particles"
+
+local function spawnCube()
+    local cube = Instance.new("Frame")
+    cube.Size = UDim2.fromOffset(math.random(4,7), math.random(4,7))
+    cube.Position = UDim2.new(math.random(),0,1.1,0)
+    cube.BackgroundColor3 = Color3.fromRGB(0,122,255)
+    cube.BackgroundTransparency = 0.2
+    cube.BorderSizePixel = 0
+    cube.Parent = ParticleFolder
+    Instance.new("UICorner", cube).CornerRadius = UDim.new(0,2)
+
+    local rise = TweenService:Create(
+        cube,
+        TweenInfo.new(math.random(4,7), Enum.EasingStyle.Linear),
+        {Position = UDim2.new(cube.Position.X.Scale,0,-0.2,0), BackgroundTransparency = 1}
+    )
+    rise:Play()
+    rise.Completed:Once(function()
+        cube:Destroy()
+    end)
+end
+
+task.spawn(function()
+    while Main.Parent do
+        spawnCube()
+        task.wait(0.15)
     end
 end)
