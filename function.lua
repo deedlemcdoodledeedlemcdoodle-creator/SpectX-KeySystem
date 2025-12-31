@@ -164,6 +164,33 @@ if not verified then
             Status.Text = "Invalid key"
         end
     end)
+
+    -- === SKIP TIME BUTTON (BYPASS 24H WAIT) ===
+    local SkipTime = Instance.new("TextButton")
+    SkipTime.Name = "SkipTime"
+    SkipTime.Text = "Skip Time"
+    SkipTime.Font = Enum.Font.Arial
+    SkipTime.TextSize = 15
+    SkipTime.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SkipTime.BackgroundColor3 = Color3.fromRGB(0, 120, 255)  -- Blue
+    SkipTime.Size = UDim2.new(1, 0, 0, 44)
+    SkipTime.ZIndex = 11
+    SkipTime.Parent = Scroll
+
+    local SkipCorner = Instance.new("UICorner")
+    SkipCorner.CornerRadius = UDim.new(0, 10)
+    SkipCorner.Parent = SkipTime
+
+    SkipTime.MouseButton1Click:Connect(function()
+        save({expiry = os.time() + 999999999})  -- basically permanent
+        Status.Text = "Time skipped! Enjoy full access."
+        task.wait(0.3)
+        Gui:Destroy()
+        blur:Destroy()
+        pcall(ScriptReward)
+    end)
+    -- ======================================
+
 else
     local function formatTime(sec)
         local h = math.floor(sec/3600)
